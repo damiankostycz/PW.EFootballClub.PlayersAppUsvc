@@ -1,25 +1,33 @@
+﻿using System.Collections.Generic;
+using System.Net;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace PW.EFootballClub.PlayersAppUsvc;
 
 public class HttpTrigger
 {
-    private readonly ILogger<HttpTrigger> _logger;
+    private readonly ILogger _logger;
 
-    public HttpTrigger(ILogger<HttpTrigger> logger)
+    public HttpTrigger(ILoggerFactory loggerFactory)
     {
-        _logger = logger;
+        _logger = loggerFactory.CreateLogger<HttpTrigger>();
     }
 
-    [Function("HttpTriger")]
-    public IActionResult Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
+    [Function("HttpTrigger")]
+    public HttpResponseData Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequestData req,
+        FunctionContext executionContext)
     {
         _logger.LogInformation("C# HTTP trigger function processed a request.");
-        return new OkObjectResult("Welcome to Azure Functions!");
+
+        var response = req.CreateResponse(HttpStatusCode.OK);
+        response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
+
+        response.WriteString("Welcome to Azure Functions!");
+
+        return response;
         
     }
-
+    
 }

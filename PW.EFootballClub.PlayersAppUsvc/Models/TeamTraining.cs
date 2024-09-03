@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
+
 namespace PW.EFootballClub.PlayersAppUsvc.Models;
 
 public class TeamTraining
