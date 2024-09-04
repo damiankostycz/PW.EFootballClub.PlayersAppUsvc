@@ -14,10 +14,10 @@ namespace PW.EFootballClub.PlayersAppUsvc.Models
         public DateTime Date { get; set; }
 
         [JsonPropertyName("homeTeam")]
-        public string? HomeTeam { get; set; } = string.Empty;
+        public string? HomeTeam { get; set; }
 
         [JsonPropertyName("awayTeam")]
-        public string? AwayTeam { get; set; } = string.Empty;
+        public string? AwayTeam { get; set; }
 
         [JsonPropertyName("lineupTeam1")]
         public Lineup? LineupTeam1 { get; set; }
@@ -26,6 +26,6 @@ namespace PW.EFootballClub.PlayersAppUsvc.Models
         public Lineup? LineupTeam2 { get; set; }
 
         [JsonPropertyName("result")]
-        public string? Result { get; set; } = string.Empty;
+        public string? Result { get; set; }
     }
 }
