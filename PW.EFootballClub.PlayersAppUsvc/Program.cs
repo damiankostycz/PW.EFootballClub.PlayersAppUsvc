@@ -12,6 +12,7 @@ var host = new HostBuilder()
         services.AddHttpClient<IMatchServices, MatchServices>();
         services.AddHttpClient<ITeamTrainingsServices, TeamTrainingsServices>();
         services.AddHttpClient<IIndividualTrainingsServices, IndividualTrainingsServices>();
+        services.AddHttpClient<ITimetableServices, TimetableServices>();
 
     })
     .Build();

@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Text.Json;
-using Azure;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
@@ -12,15 +11,17 @@ namespace PW.EFootballClub.PlayersAppUsvc;
 public class HttpTrigger
 {
     private readonly ILogger _logger;
-    private readonly IMatchServices _matchService;
+    private readonly IMatchServices _matchServices;
     private readonly IIndividualTrainingsServices _individualTrainingsServices;
     private readonly ITeamTrainingsServices _teamTrainingsServices;
-    public HttpTrigger(ILoggerFactory loggerFactory, IMatchServices matchService, IIndividualTrainingsServices individualTrainingsServices, ITeamTrainingsServices teamTrainingsServices)
+    private readonly ITimetableServices _timetableService;
+    public HttpTrigger(ILoggerFactory loggerFactory, ITimetableServices timetableServices,IMatchServices matchService, IIndividualTrainingsServices individualTrainingsServices, ITeamTrainingsServices teamTrainingsServices)
     {
         _logger = loggerFactory.CreateLogger<HttpTrigger>();
-        _matchService = matchService;
+        _matchServices = matchService;
         _individualTrainingsServices = individualTrainingsServices;
         _teamTrainingsServices = teamTrainingsServices;
+        _timetableService = timetableServices;
     }
 
     [Function("GetAllMatches")]
@@ -30,7 +31,7 @@ public class HttpTrigger
         try
         {
             _logger.LogInformation("Fetching all matches...");
-            var matches = await _matchService.GetAllMatchesAsync();
+            var matches = await _matchServices.GetAllMatchesAsync();
 
             var response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteAsJsonAsync(matches);
@@ -67,7 +68,7 @@ public class HttpTrigger
             }
 
             _logger.LogInformation($"Fetching match with ID: {matchId}...");
-            Match match = await _matchService.GetMatchByIdAsync(matchId);
+            Match match = await _matchServices.GetMatchByIdAsync(matchId);
             var response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteAsJsonAsync(match);
             return response;
@@ -180,20 +181,51 @@ public class HttpTrigger
         return response;
     }
     
-    
-    [Function("HttpTrigger")]
-    public HttpResponseData Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req,
-        FunctionContext executionContext)
+    [Function("GetAllTimetables")]
+    public async Task<HttpResponseData> GetAllTimetables(
+        [HttpTrigger(AuthorizationLevel.Function, "get", Route = "getAllTimetables")] HttpRequestData req)
     {
-        _logger.LogInformation("C# HTTP trigger function processed a request.");
+        _logger.LogInformation("Handling request: {Method}", req.Method);
 
-        var response = req.CreateResponse(HttpStatusCode.OK);
-        response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
+        HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
 
-        response.WriteString("Welcome to Azure Functions!");
+        try
+        {
+            var matchesTask = _matchServices.GetAllMatchesAsync();
+            var timetablesTask = _timetableService.GetAllTimetablesAsync();
+
+            await Task.WhenAll(matchesTask, timetablesTask);
+
+            var timetables = await timetablesTask;
+            var matches = await matchesTask;
+
+            var matchDictionary = matches.ToDictionary(m => m.Id);
+
+            var timetableDtos = timetables.Select(timetable => new TimetableDto
+            {
+                Id = timetable.Id,
+                Team = timetable.Team,
+                League = timetable.League,
+                Season = timetable.Season,
+                Matches = timetable.Matches?
+                    .Select(matchId => matchDictionary.TryGetValue(matchId, out var match) ? match : null)
+                    .Where(match => match != null)
+                    .ToList()!
+            }).ToList();
+
+            await response.WriteAsJsonAsync(timetableDtos);
+
+            _logger.LogInformation("Received timetable data from API...");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while fetching timetables.");
+            response = req.CreateResponse(HttpStatusCode.InternalServerError);
+            await response.WriteStringAsync("An error occurred while fetching timetables.");
+        }
 
         return response;
-        
     }
+
     
 }
