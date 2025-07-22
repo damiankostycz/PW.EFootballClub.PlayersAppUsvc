@@ -1,31 +1,33 @@
-﻿using System.Text.Json.Serialization;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
-namespace PW.EFootballClub.PlayersAppUsvc.Models
+namespace PW.EFootballClub.PlayersAppUsvc.Models;
+
+public class Match
 {
-    public class Match
-    {
-        [JsonPropertyName("id")]
-        public string Id { get; set; } = string.Empty;
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string Id { get; set; } = string.Empty;
 
-        [JsonPropertyName("events")]
-        public List<Event>? Events { get; set; }
+    [BsonElement("events")]
+    public List<Event>? Events { get; set; }
 
-        [JsonPropertyName("date")]
-        public DateTime Date { get; set; }
+    [BsonElement("date")]
+    [BsonRepresentation(BsonType.DateTime)]
+    public DateTime Date { get; set; }
 
-        [JsonPropertyName("homeTeam")]
-        public string? HomeTeam { get; set; }
+    [BsonElement("home_team")]
+    public required string HomeTeam { get; set; }
 
-        [JsonPropertyName("awayTeam")]
-        public string? AwayTeam { get; set; }
+    [BsonElement("away_team")]
+    public required string AwayTeam { get; set; }
 
-        [JsonPropertyName("lineupTeam1")]
-        public Lineup? LineupTeam1 { get; set; }
+    [BsonElement("lineup_team1")]
+    public required Lineup LineupTeam1 { get; set; }
 
-        [JsonPropertyName("lineupTeam2")]
-        public Lineup? LineupTeam2 { get; set; }
+    [BsonElement("lineup_team2")]
+    public required Lineup LineupTeam2 { get; set; }
 
-        [JsonPropertyName("result")]
-        public string? Result { get; set; }
-    }
+    [BsonElement("result")]
+    public required string Result { get; set; }
 }

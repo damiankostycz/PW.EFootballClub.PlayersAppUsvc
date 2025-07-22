@@ -15,6 +15,8 @@ public class HttpTrigger
     private readonly IIndividualTrainingsServices _individualTrainingsServices;
     private readonly ITeamTrainingsServices _teamTrainingsServices;
     private readonly ITimetableServices _timetableService;
+    private readonly string? _apimKey = Environment.GetEnvironmentVariable("APIM_KEY");
+
     public HttpTrigger(ILoggerFactory loggerFactory, ITimetableServices timetableServices,IMatchServices matchService, IIndividualTrainingsServices individualTrainingsServices, ITeamTrainingsServices teamTrainingsServices)
     {
         _logger = loggerFactory.CreateLogger<HttpTrigger>();
@@ -31,7 +33,7 @@ public class HttpTrigger
         try
         {
             _logger.LogInformation("Fetching all matches...");
-            var matches = await _matchServices.GetAllMatchesAsync();
+            var matches = await _matchServices.GetAllMatchesAsync(_apimKey);
 
             var response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteAsJsonAsync(matches);
@@ -48,39 +50,7 @@ public class HttpTrigger
         }
     }
 
-
     
-    [Function("GetMatchById")]
-    public async Task<HttpResponseData> GetMatchById(
-        [HttpTrigger(AuthorizationLevel.Function, "get", Route = "getMatch")] HttpRequestData req)
-    {
-        try
-        {
-            var queryParameters = System.Web.HttpUtility.ParseQueryString(req.Url.Query);
-            var matchId = queryParameters["id"];
-
-            if (string.IsNullOrEmpty(matchId))
-            {
-                _logger.LogWarning("Bad request: Missing match ID.");
-                var badRequestResponse = req.CreateResponse(HttpStatusCode.BadRequest);
-                await badRequestResponse.WriteStringAsync("Bad request: Missing match ID.");
-                return badRequestResponse;
-            }
-
-            _logger.LogInformation($"Fetching match with ID: {matchId}...");
-            Match match = await _matchServices.GetMatchByIdAsync(matchId);
-            var response = req.CreateResponse(HttpStatusCode.OK);
-            await response.WriteAsJsonAsync(match);
-            return response;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"Error fetching match: {ex.Message}");
-            var errorResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
-            await errorResponse.WriteStringAsync("An error occurred while fetching the match data.");
-            return errorResponse;
-        }
-    }
     
      [Function("HandleIndividualTrainings")]
     public async Task<HttpResponseData> HandleTeamTraining(
@@ -91,22 +61,12 @@ public class HttpTrigger
         switch (req.Method.ToUpper())
         {
             case "GET":
-                var queryParameters = System.Web.HttpUtility.ParseQueryString(req.Url.Query);
-                var individualTrainingId = queryParameters["id"];
-                if (string.IsNullOrEmpty(individualTrainingId))
-                {
-                    _logger.LogInformation("Fetching all team trainings...");
-                    var individualTrainings = await _individualTrainingsServices.GetIndividualTrainingsAsync();
-                    response = req.CreateResponse(HttpStatusCode.OK);
-                    await response.WriteAsJsonAsync(individualTrainings);
-                }
-                else
-                {
-                    _logger.LogInformation($"Fetching individual training with ID: {individualTrainingId}...");
-                    var individualTraining = await _individualTrainingsServices.GetIndividualTrainingByIdAsync(individualTrainingId);
-                    response = req.CreateResponse(HttpStatusCode.OK);
-                    await response.WriteAsJsonAsync(individualTraining);
-                }
+
+                _logger.LogInformation("Fetching all team trainings...");
+                var individualTrainings = await _individualTrainingsServices.GetIndividualTrainingsAsync(_apimKey);
+                response = req.CreateResponse(HttpStatusCode.OK);
+                await response.WriteAsJsonAsync(individualTrainings);
+
                 break;
 
             case "PUT":
@@ -118,7 +78,7 @@ public class HttpTrigger
                 {
                     try
                     {
-                        var result = await _individualTrainingsServices.UpdateIndividualTrainingAsync(updatedIndividualTraining);
+                        var result = await _individualTrainingsServices.UpdateIndividualTrainingAsync(updatedIndividualTraining, _apimKey);
                         response = req.CreateResponse(HttpStatusCode.OK);
                         _logger.LogError($"Updated training with id: {updatedIndividualTraining.Id}");
                         await response.WriteAsJsonAsync(result);
@@ -158,11 +118,11 @@ public class HttpTrigger
         {
             var queryParameters = System.Web.HttpUtility.ParseQueryString(req.Url.Query);
             var teamId = queryParameters["teamId"];
-            var teamTrainings = await _teamTrainingsServices.GetTeamTrainingsAsync();
+            var teamTrainings = await _teamTrainingsServices.GetTeamTrainingsAsync(_apimKey);
 
             if (!string.IsNullOrEmpty(teamId) && teamTrainings.Count != 0)
             {
-                teamTrainings = teamTrainings.Where(t => t.TeamId == teamId).ToList();
+                teamTrainings = teamTrainings.Where(t => t.TeamID == teamId).ToList();
                 await response.WriteAsJsonAsync(teamTrainings);
             }
             else
@@ -191,8 +151,8 @@ public class HttpTrigger
 
         try
         {
-            var matchesTask = _matchServices.GetAllMatchesAsync();
-            var timetablesTask = _timetableService.GetAllTimetablesAsync();
+            var matchesTask = _matchServices.GetAllMatchesAsync(_apimKey);
+            var timetablesTask = _timetableService.GetAllTimetablesAsync(_apimKey);
 
             await Task.WhenAll(matchesTask, timetablesTask);
 

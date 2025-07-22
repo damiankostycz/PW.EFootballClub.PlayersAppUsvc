@@ -1,22 +1,22 @@
-﻿using System.Text.Json.Serialization;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace PW.EFootballClub.PlayersAppUsvc.Models;
 
 public class Timetable
 {
-    
-    [JsonPropertyName("id")]
+
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = string.Empty;
 
-    [JsonPropertyName("team")]
-    public string Team { get; set; } = string.Empty;
+    [BsonElement("team")] public string Team { get; set; } = string.Empty;
 
-    [JsonPropertyName("league")]
-    public string League { get; set; } = string.Empty;
+    [BsonElement("league")] public string League { get; set; } = string.Empty;
 
-    [JsonPropertyName("matches")]
+    [BsonElement("MatchesID")]
+    [BsonRepresentation(BsonType.ObjectId)]
     public List<string>? Matches { get; set; }
 
-    [JsonPropertyName("season")]
-    public string Season { get; set; } = string.Empty;
+    [BsonElement("season")] public string Season { get; set; } = string.Empty;
 }

@@ -1,14 +1,38 @@
-﻿namespace PW.EFootballClub.PlayersAppUsvc.Models;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
-public class Player
+namespace PW.EFootballClub.PlayersAppUsvc.Models
 {
-    public string PlayerId { get; set; } = string.Empty;
-    public required string Name { get; set; }
-    public required string LastName { get; set; }
-    public required DateTime DateOfBirth { get; set; }
-    public required string Sex { get; set; }
-    public required string Position { get; set; }
-    public required PlayerStats PlayerStats { get; set; }
-    public string? TeamId { get; set; }
+    public class Player
+    {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string PlayerId { get; set; } = string.Empty;
+
+        [BsonElement("name")]
+        public required string Name { get; set; }
+
+        [BsonElement("last_name")]
+        public required string LastName { get; set; }
+
+        [BsonElement("date_of_birth")]
+        [BsonRepresentation(BsonType.DateTime)]
+        public required DateTime DateOfBirth { get; set; }
+
+        [BsonElement("sex")]
+        public required string Sex { get; set; }
+
+        [BsonElement("position")]
+        public required string Position { get; set; }
+
+        [BsonElement("stats")]
+        public required PlayerStats PlayerStats { get; set; }
+
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string? TeamID { get; set; }
+
+
+    }
+
 
 }

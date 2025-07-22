@@ -1,28 +1,29 @@
-﻿using System.Text.Json.Serialization;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
-namespace PW.EFootballClub.PlayersAppUsvc.Models
-{
-    public class Scout
-    {
-        [JsonPropertyName("id")]
-        public string Id { get; set; } = string.Empty;
+namespace PW.EFootballClub.PlayersAppUsvc.Models;
 
-        [JsonPropertyName("name")]
-        public required string Name { get; set; }
+public class Scout
+{      
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string Id { get; set; } = string.Empty;
 
-        [JsonPropertyName("lastName")]
-        public required string LastName { get; set; }
+    [BsonElement("name")]
+    public required string Name { get; set; }
 
-        [JsonPropertyName("country")]
-        public required string Country { get; set; }
+    [BsonElement("last_name")]
+    public required string LastName { get; set; }
 
-        [JsonPropertyName("club")]
-        public required string Club { get; set; }
+    [BsonElement("country")]
+    public required string Country { get; set; }
 
-        [JsonPropertyName("languages")]
-        public required List<string> Languages { get; set; }
+    [BsonElement("club")]
+    public required string Club { get; set; }
 
-        [JsonPropertyName("playersUnderObservation")]
-        public required List<string> PlayersUnderObservation { get; set; }
-    }
+    [BsonElement("languages")]
+    public required List<string> Languages { get; set; }
+
+    [BsonElement("players_under_observation")]
+    public required List<string> PlayersUnderObservation { get; set; }
 }

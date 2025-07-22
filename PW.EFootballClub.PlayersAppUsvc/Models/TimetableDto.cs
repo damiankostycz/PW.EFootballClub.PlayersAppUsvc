@@ -1,4 +1,4 @@
-﻿namespace PW.EFootballClub.PlayersAppUsvc.Models;
+namespace PW.EFootballClub.PlayersAppUsvc.Models;
 
 public class TimetableDto
 {

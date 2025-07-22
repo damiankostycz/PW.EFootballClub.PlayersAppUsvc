@@ -1,19 +1,19 @@
-﻿using System.Text.Json.Serialization;
+﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace PW.EFootballClub.PlayersAppUsvc.Models
+namespace PW.EFootballClub.PlayersAppUsvc.Models;
+
+public class Event
 {
-    public class Event
-    {
-        [JsonPropertyName("minute")]
-        public int Minute { get; set; }
+    [BsonElement("minute")]
+    public int Minute { get; set; }
 
-        [JsonPropertyName("type")]
-        public string Type { get; set; } = string.Empty;
+    [BsonElement("type")]
+    public string Type { get; set; } = string.Empty;
 
-        [JsonPropertyName("player")]
-        public string Player { get; set; } = string.Empty;
+    [BsonElement("player")]
+    public string Player { get; set; } = string.Empty;
 
-        [JsonPropertyName("team")]
-        public string Team { get; set; } = string.Empty;
-    }
+    [BsonElement("team")]
+    public string Team { get; set; } = string.Empty;
+    
 }

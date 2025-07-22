@@ -1,25 +1,26 @@
-﻿using System.Text.Json.Serialization;
+﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace PW.EFootballClub.PlayersAppUsvc.Models
+namespace PW.EFootballClub.PlayersAppUsvc.Models;
+
+public class Lineup
 {
-    public class Lineup
-    {
-        [JsonPropertyName("formation")]
-        public string? Formation { get; set; }
+    
+    [BsonElement("formation")]
+    public required string Formation { get; set; }
 
-        [JsonPropertyName("goalkeeper")]
-        public int Goalkeeper { get; set; }
+    [BsonElement("goalkeeper")]
+    public int Goalkeeper { get; set; }
 
-        [JsonPropertyName("defenders")]
-        public List<int>? Defenders { get; set; }
+    [BsonElement("defenders")]
+    public required List<int> Defenders { get; set; }
 
-        [JsonPropertyName("midfielders")]
-        public List<int>? Midfielders { get; set; }
+    [BsonElement("midfielders")]
+    public required List<int> Midfielders { get; set; }
 
-        [JsonPropertyName("strikers")]
-        public List<int>? Strikers { get; set; }
+    [BsonElement("strikers")]
+    public required List<int> Strikers { get; set; }
 
-        [JsonPropertyName("substitutes")]
-        public List<int>? Substitutes { get; set; }
-    }
+    [BsonElement("substitutes")]
+    public required List<int> Substitutes { get; set; }
+
 }

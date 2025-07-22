@@ -4,8 +4,7 @@ namespace PW.EFootballClub.PlayersAppUsvc.Services.Interfaces;
 
 public interface IIndividualTrainingsServices
 {
-    Task<List<IndividualTraining>> GetIndividualTrainingsAsync();
-    Task<IndividualTraining> GetIndividualTrainingByIdAsync(string id);
-    Task<IndividualTraining> UpdateIndividualTrainingAsync(IndividualTraining individualTraining);
+    Task<List<IndividualTraining>> GetIndividualTrainingsAsync(string apimKey);
+    Task<IndividualTraining> UpdateIndividualTrainingAsync(IndividualTraining individualTraining, string apimKey);
 
 }

@@ -1,22 +1,25 @@
-﻿using System.Text.Json.Serialization;
-
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace PW.EFootballClub.PlayersAppUsvc.Models;
 
 public class TeamTraining
 {
-    [JsonPropertyName("id")]
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = string.Empty;
 
-    [JsonPropertyName("date")]
+    [BsonElement("date")]
+    [BsonRepresentation(BsonType.DateTime)]
     public DateTime Date { get; set; }
 
-    [JsonPropertyName("duration")]
+    [BsonElement("duration")]
     public int Duration { get; set; }
 
-    [JsonPropertyName("type")]
+    [BsonElement("type")]
     public string Type { get; set; } = string.Empty;
 
-    [JsonPropertyName("teamID")]
-    public string? TeamId { get; set; }
+    [BsonElement("TeamID")]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string TeamID { get; set; }
 }

@@ -7,26 +7,24 @@ namespace PW.EFootballClub.PlayersAppUsvc.Services.Implementations;
 public class MatchServices : IMatchServices
 {
     private readonly HttpClient _httpClient;
-    private readonly string _baseUri = "https://matchesdatausvc.proudwave-86bbe606.westeurope.azurecontainerapps.io/MatchesData";
+    private readonly string? _baseUri = Environment.GetEnvironmentVariable("MATCH_DATA_USVC_URL");
 
     public MatchServices(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }
 
-    public async Task<List<Match>> GetAllMatchesAsync()
+    public async Task<List<Match>> GetAllMatchesAsync(string apimKey)
     {
-        var response = await _httpClient.GetAsync($"{_baseUri}/getAllMatches");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUri}");
+        request.Headers.Add("Ocp-Apim-Subscription-Key", apimKey);
+
+        var response = await _httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
+
         var content = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<List<Match>>(content)!;
     }
 
-    public async Task<Match> GetMatchByIdAsync(string id)
-    {
-        var response = await _httpClient.GetAsync($"{_baseUri}/getMatchById?matchId={id}");
-        response.EnsureSuccessStatusCode();
-        var content = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<Match>(content)!;
-    }
+
 }

@@ -4,6 +4,6 @@ namespace PW.EFootballClub.PlayersAppUsvc.Services.Interfaces;
 
 public interface ITimetableServices
 {
-    Task<List<Timetable>> GetAllTimetablesAsync();
+    Task<List<Timetable>> GetAllTimetablesAsync(string apimKey);
 
 }

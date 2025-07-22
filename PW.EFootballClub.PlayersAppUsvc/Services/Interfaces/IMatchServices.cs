@@ -4,6 +4,5 @@ namespace PW.EFootballClub.PlayersAppUsvc.Services.Interfaces;
 
 public interface IMatchServices
 {
-    Task<List<Match>> GetAllMatchesAsync();
-    Task<Match> GetMatchByIdAsync(string id);
+    Task<List<Match>> GetAllMatchesAsync(string apimKey);
 }

@@ -1,15 +1,15 @@
-﻿using System.Text.Json.Serialization;
+﻿using MongoDB.Bson.Serialization.Attributes;
 
 namespace PW.EFootballClub.PlayersAppUsvc.Models;
 
 public class Exercise
-{
-    [JsonPropertyName("name")]
+{        
+    [BsonElement("name")]
     public string Name { get; set; } = string.Empty;
-    
-    [JsonPropertyName("description")]
+
+    [BsonElement("description")]
     public string Description { get; set; } = string.Empty;
-    
-    [JsonPropertyName("reps")]
+
+    [BsonElement("reps")]
     public string Reps { get; set; } = string.Empty;
 }
